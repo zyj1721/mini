@@ -230,8 +230,7 @@ namespace miniplc0 {
                         return std::make_pair(std::make_optional<Token>(TokenType::PRINT, 'PRINT', pos, currentPos()), std::optional<CompilationError>());
                     }
                     else{
-                        ss >> result;
-                        return std::make_pair(std::make_optional<Token>(TokenType::IDENTIFIER, result, pos, currentPos()), std::optional<CompilationError>());
+                        return std::make_pair(std::make_optional<Token>(TokenType::IDENTIFIER, ss, pos, currentPos()), std::optional<CompilationError>());
                     }
 				}
 				break;
@@ -269,15 +268,15 @@ namespace miniplc0 {
 				unreadLast(); // Yes, we unread last char even if it's an EOF.
 				return std::make_pair(std::make_optional<Token>(TokenType::SEMICOLON, ';', pos, currentPos()), std::optional<CompilationError>());
 			}
-			case LEFT_BRACKET_STATE: {
+			case LEFTBRACKET_STATE: {
 				// 回退，并返回左括号token
 				unreadLast(); // Yes, we unread last char even if it's an EOF.
-				return std::make_pair(std::make_optional<Token>(TokenType::LEFT_BRACKET_SIGN, '(', pos, currentPos()), std::optional<CompilationError>());
+				return std::make_pair(std::make_optional<Token>(TokenType::LEFT_BRACKET, '(', pos, currentPos()), std::optional<CompilationError>());
 			}
-			case RIGHT_SIGN_STATE: {
+			case RIGHTSIGN_STATE: {
 				// 回退，并返回右括号token
 				unreadLast(); // Yes, we unread last char even if it's an EOF.
-				return std::make_pair(std::make_optional<Token>(TokenType::RIGHT_BRACKET_SIGN, ')', pos, currentPos()), std::optional<CompilationError>());
+				return std::make_pair(std::make_optional<Token>(TokenType::RIGHT_BRACKET, ')', pos, currentPos()), std::optional<CompilationError>());
 			}
 
 								   // 对于其他的合法状态，进行合适的操作
