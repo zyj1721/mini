@@ -2,7 +2,7 @@
 
 #include <cctype>
 #include <sstream>
-
+#include<cstring>
 namespace miniplc0 {
 
 	std::pair<std::optional<Token>, std::optional<CompilationError>> Tokenizer::NextToken() {
