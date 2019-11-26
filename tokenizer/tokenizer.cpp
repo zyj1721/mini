@@ -207,9 +207,7 @@ namespace miniplc0 {
                         return std::make_pair(std::make_optional<Token>(TokenType::IDENTIFIER, sss, pos, currentPos()), std::optional<CompilationError>());
                     }
 				}
-				auto ch = current_char.value();
-				// 如果读到的是字符或字母，则存储读到的字符
-				else if (miniplc0::isalpha(ch) || miniplc0::isdigit(ch)){
+				else if (miniplc0::isalpha(current_char.value()) || miniplc0::isdigit(current_char.value())){
                     ss << ch;
 				}
 				// 如果读到的字符不是上述情况之一，则回退读到的字符，并解析已经读到的字符串
