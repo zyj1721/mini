@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "tokenizer/token.h"
 #include "tokenizer/utils.hpp"
@@ -51,6 +51,10 @@ namespace miniplc0 {
 		//
 		// 返回下一个 token，是 NextToken 实际实现部分
 		std::pair<std::optional<Token>, std::optional<CompilationError>> nextToken();
+
+		std::string delete_zero(std::string s)；
+
+		int isLarger(std::string s)；
 
 		// 从这里开始其实是一个基于行号的缓冲区的实现
 		// 为了简单起见，我们没有单独拿出一个类实现
