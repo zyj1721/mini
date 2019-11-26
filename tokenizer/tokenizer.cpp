@@ -224,19 +224,19 @@ namespace miniplc0 {
                     std::string sss;
                     sss = ss.str();
                     pos = previousPos();
-                    if(strcmp(sss, "BEGIN") == 0){
+                    if(sss == "BEGIN"){
                         return std::make_pair(std::make_optional<Token>(TokenType::BEGIN, "BEGIN", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(strcmp(sss, "END") == 0){
+                    else if(sss == "END"){
                         return std::make_pair(std::make_optional<Token>(TokenType::END, "END", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(strcmp(sss, "VAR") == 0){
+                    else if(sss == "VAR"){
                         return std::make_pair(std::make_optional<Token>(TokenType::VAR, "VAR", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(strcmp(sss, "CONST") == 0){
+                    else if(sss == "CONST"){
                         return std::make_pair(std::make_optional<Token>(TokenType::CONST, "CONST", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(strcmp(sss, "PRINT") == 0){
+                    else if(sss == "PRINT"){
                         return std::make_pair(std::make_optional<Token>(TokenType::PRINT, "PRINT", pos, currentPos()), std::optional<CompilationError>());
                     }
                     else{
