@@ -190,21 +190,22 @@ namespace miniplc0 {
 				//     如果解析结果是关键字，那么返回对应关键字的token，否则返回标识符的token
 				if (!current_char.has_value()){
                     unreadLast();
-                    std::string sss = ss.str();
+                    std::string sss;
+                    sss = ss.str();
                     pos = previousPos();
-                    if(strcmp(sss, "BEGIN") == 0){
+                    if(sss == "BEGIN"){
                         return std::make_pair(std::make_optional<Token>(TokenType::BEGIN, "BEGIN", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(strcmp(sss, "END") == 0){
+                    else if(sss == "END"){
                         return std::make_pair(std::make_optional<Token>(TokenType::END, "END", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(strcmp(sss, "VAR") == 0){
+                    else if(sss == "VAR"){
                         return std::make_pair(std::make_optional<Token>(TokenType::VAR, "VAR", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(strcmp(sss, "CONST") == 0){
+                    else if(sss == "CONST"){
                         return std::make_pair(std::make_optional<Token>(TokenType::CONST, "CONST", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(strcmp(sss, "PRINT") == 0){
+                    else if(sss == "PRINT"){
                         return std::make_pair(std::make_optional<Token>(TokenType::PRINT, "PRINT", pos, currentPos()), std::optional<CompilationError>());
                     }
                     else{
@@ -220,7 +221,8 @@ namespace miniplc0 {
 				//     如果解析结果是关键字，那么返回对应关键字的token，否则返回标识符的token
 				else{
                     unreadLast();
-                    std::string sss = ss.str();
+                    std::string sss;
+                    sss = ss.str();
                     pos = previousPos();
                     if(strcmp(sss, "BEGIN") == 0){
                         return std::make_pair(std::make_optional<Token>(TokenType::BEGIN, "BEGIN", pos, currentPos()), std::optional<CompilationError>());
