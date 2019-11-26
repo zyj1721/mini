@@ -148,7 +148,7 @@ namespace miniplc0 {
                     std::stringstream tmp;
                     tmp << sss;
                     tmp >> n;
-                    return std::make_pair(std::make_optional<Token>(TokenType::UNSIGNED_INTEGER,dig, pos, currentPos()), std::optional<CompilationError>());
+                    return std::make_pair(std::make_optional<Token>(TokenType::UNSIGNED_INTEGER,n, pos, currentPos()), std::optional<CompilationError>());
 				}
 				// 获取读到的字符的值，注意auto推导出的类型是char
 				auto ch = current_char.value();
@@ -367,7 +367,7 @@ namespace miniplc0 {
         int leng = s.length();
         int i=0;
         for(; i<leng; i++){
-            if(str[i] != '0'){
+            if(s[i] != '0'){
                 break;
             }
         }
