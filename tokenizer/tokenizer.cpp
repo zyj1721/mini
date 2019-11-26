@@ -167,7 +167,6 @@ namespace miniplc0 {
 				//     解析成功则返回无符号整数类型的token，否则返回编译错误
 				else{
                     unreadLast();
-                    pos = previousPos();
                     std::string sss;
                     ss >> sss;
                     sss = delete_zero(sss);
@@ -192,7 +191,6 @@ namespace miniplc0 {
                     unreadLast();
                     std::string sss;
                     sss = ss.str();
-                    pos = previousPos();
                     if(sss == "BEGIN"){
                         return std::make_pair(std::make_optional<Token>(TokenType::BEGIN, "BEGIN", pos, currentPos()), std::optional<CompilationError>());
                     }
@@ -223,7 +221,6 @@ namespace miniplc0 {
                     unreadLast();
                     std::string sss;
                     sss = ss.str();
-                    pos = previousPos();
                     if(sss == "BEGIN"){
                         return std::make_pair(std::make_optional<Token>(TokenType::BEGIN, "BEGIN", pos, currentPos()), std::optional<CompilationError>());
                     }
