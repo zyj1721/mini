@@ -1,4 +1,4 @@
-#include "tokenizer/tokenizer.h"
+﻿#include "tokenizer/tokenizer.h"
 
 #include <cctype>
 #include <sstream>
@@ -136,8 +136,6 @@ namespace miniplc0 {
 				// 如果当前已经读到了文件尾，则解析已经读到的字符串为整数
 				//     解析成功则返回无符号整数类型的token，否则返回编译错误
 				if (!current_char.has_value()){
-                    unreadLast();
-                    pos = previousPos();
                     std::string sss;
                     ss >> sss;
                     sss = delete_zero(sss);
@@ -188,7 +186,6 @@ namespace miniplc0 {
 				// 如果当前已经读到了文件尾，则解析已经读到的字符串
 				//     如果解析结果是关键字，那么返回对应关键字的token，否则返回标识符的token
 				if (!current_char.has_value()){
-                    unreadLast();
                     std::string sss;
                     sss = ss.str();
                     if(sss == "BEGIN"){
