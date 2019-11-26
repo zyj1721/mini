@@ -209,7 +209,7 @@ namespace miniplc0 {
 				}
 				auto ch = current_char.value();
 				// 如果读到的是字符或字母，则存储读到的字符
-				if (miniplc0::isalpha(ch) || miniplc0::isdigit(ch)){
+				else if (miniplc0::isalpha(ch) || miniplc0::isdigit(ch)){
                     ss << ch;
 				}
 				// 如果读到的字符不是上述情况之一，则回退读到的字符，并解析已经读到的字符串
