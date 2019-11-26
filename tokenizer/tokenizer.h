@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "tokenizer/token.h"
 #include "tokenizer/utils.hpp"
@@ -43,7 +43,6 @@ namespace miniplc0 {
 		std::pair<std::optional<Token>, std::optional<CompilationError>> NextToken();
 		// 一次返回所有 token
 		std::pair<std::vector<Token>, std::optional<CompilationError>> AllTokens();
-
 	private:
 		// 检查 Token 的合法性
 		std::optional<CompilationError> checkToken(const Token&);
@@ -52,7 +51,7 @@ namespace miniplc0 {
 		//
 		// 返回下一个 token，是 NextToken 实际实现部分
 		std::pair<std::optional<Token>, std::optional<CompilationError>> nextToken();
-		
+
 		// 从这里开始其实是一个基于行号的缓冲区的实现
 		// 为了简单起见，我们没有单独拿出一个类实现
 		// 核心思想和 C 的文件输入输出类似，就是一个 buffer 加一个指针，有三个细节
@@ -64,10 +63,10 @@ namespace miniplc0 {
 		// 这样其实是不合理的，这里只是简单起见这么实现
 		void readAll();
 		// 一个简单的总结
-		// | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9  | 偏移
-		// | = | = | = | = | = | = | = | = | = | =  |
-		// | h | a | 1 | 9 | 2 | 6 | 0 | 8 | 1 | \n |（缓冲区第0行）
-		// | 7 | 1 | 1 | 4 | 5 | 1 | 4 |             （缓冲区第1行）
+		// 偏移   | 0 | 1 | 2 | 3 | 4 | 4 | 5 | 6 | 7 | 8 | 9  |
+		//        | = | = | = | = | = | = | = | = | = | = | =  |
+		// 缓冲区 | h | a | 1 | 9 | 2 | 6 | 0 | 8 | 1 | 7 | \n |（第0行）
+		//        | 1 | 1 | 4 | 5 | 1 | 4 |                     （第1行）
 		// 这里假设指针指向第一行的 \n，那么有
 		// nextPos() = (1, 0)
 		// currentPos() = (0, 9)
