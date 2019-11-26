@@ -208,7 +208,7 @@ namespace miniplc0 {
                     }
 				}
 				else if (miniplc0::isalpha(current_char.value()) || miniplc0::isdigit(current_char.value())){
-                    ss << ch;
+                    ss << current_char.value();
 				}
 				// 如果读到的字符不是上述情况之一，则回退读到的字符，并解析已经读到的字符串
 				//     如果解析结果是关键字，那么返回对应关键字的token，否则返回标识符的token
