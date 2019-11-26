@@ -44,9 +44,9 @@ namespace miniplc0 {
 		// 一次返回所有 token
 		std::pair<std::vector<Token>, std::optional<CompilationError>> AllTokens();
 
-		bool isOverflow(std::string str);
-		TokenType isKeyToken(std::string str);
-		std::string delFrontZero(std::string str);
+		std::string delete_zero(std::string s);
+		
+		int isLarger(std::string s);
 	private:
 		// 检查 Token 的合法性
 		std::optional<CompilationError> checkToken(const Token&);

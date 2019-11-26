@@ -137,6 +137,7 @@ namespace miniplc0 {
 				//     解析成功则返回无符号整数类型的token，否则返回编译错误
 				if (!current_char.has_value()){
                     unreadLast();
+                    pos = previousPos();
                     std::string sss;
                     ss >> sss;
                     sss = delete_zero(sss);
@@ -166,6 +167,7 @@ namespace miniplc0 {
 				//     解析成功则返回无符号整数类型的token，否则返回编译错误
 				else{
                     unreadLast();
+                    pos = previousPos();
                     std::string sss;
                     ss >> sss;
                     sss = delete_zero(sss);
@@ -190,6 +192,7 @@ namespace miniplc0 {
                     unreadLast();
                     std::string sss;
                     sss = ss.str();
+                    pos = previousPos();
                     if(sss == "BEGIN"){
                         return std::make_pair(std::make_optional<Token>(TokenType::BEGIN, "BEGIN", pos, currentPos()), std::optional<CompilationError>());
                     }
@@ -221,19 +224,19 @@ namespace miniplc0 {
                     std::string sss;
                     sss = ss.str();
                     pos = previousPos();
-                    if(strcmp(sss == "BEGIN"){
+                    if(strcmp(sss, "BEGIN") == 0){
                         return std::make_pair(std::make_optional<Token>(TokenType::BEGIN, "BEGIN", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(sss == "END"){
+                    else if(strcmp(sss, "END") == 0){
                         return std::make_pair(std::make_optional<Token>(TokenType::END, "END", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(sss == "VAR"){
+                    else if(strcmp(sss, "VAR") == 0){
                         return std::make_pair(std::make_optional<Token>(TokenType::VAR, "VAR", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(sss == "CONST"){
+                    else if(strcmp(sss, "CONST") == 0){
                         return std::make_pair(std::make_optional<Token>(TokenType::CONST, "CONST", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(sss == "PRINT"){
+                    else if(strcmp(sss, "PRINT") == 0){
                         return std::make_pair(std::make_optional<Token>(TokenType::PRINT, "PRINT", pos, currentPos()), std::optional<CompilationError>());
                     }
                     else{
