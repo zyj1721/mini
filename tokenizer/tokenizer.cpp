@@ -3,6 +3,7 @@
 #include <cctype>
 #include <sstream>
 #include <string>
+#include <cstring>
 
 namespace miniplc0 {
 
@@ -280,7 +281,7 @@ namespace miniplc0 {
 				unreadLast(); // Yes, we unread last char even if it's an EOF.
 				return std::make_pair(std::make_optional<Token>(TokenType::LEFT_BRACKET, '(', pos, currentPos()), std::optional<CompilationError>());
 			}
-			case RIGHTSIGN_STATE: {
+			case RIGHTBRACKET_STATE: {
 				// 回退，并返回右括号token
 				unreadLast(); // Yes, we unread last char even if it's an EOF.
 				return std::make_pair(std::make_optional<Token>(TokenType::RIGHT_BRACKET, ')', pos, currentPos()), std::optional<CompilationError>());
