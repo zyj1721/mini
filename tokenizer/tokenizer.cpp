@@ -136,19 +136,12 @@ namespace miniplc0 {
 				// 如果当前已经读到了文件尾，则解析已经读到的字符串为整数
 				//     解析成功则返回无符号整数类型的token，否则返回编译错误
 				if (!current_char.has_value()){
-                    std::string sss;
-                    ss >> sss;
-                    sss = delete_zero(sss);
-                    //超出integer范围
-                    if(isLarger(sss)){
-                        return std::make_pair(std::optional<Token>(), std::make_optional<CompilationError>(pos, ErrorCode::ErrIntegerOverflow));
-                    }
-                    //没有超出范围
                     int n;
-                    std::stringstream tmp;
-                    tmp << sss;
-                    tmp >> n;
-                    return std::make_pair(std::make_optional<Token>(TokenType::UNSIGNED_INTEGER,n, pos, currentPos()), std::optional<CompilationError>());
+					ss >> n;
+					if (ss.fail())
+                        return std::make_pair(std::optional<Token>(), std::make_optional<CompilationError>(pos, ErrorCode::ErrIntegerOverflow));
+					else
+                        return std::make_pair(std::make_optional<Token>(TokenType::UNSIGNED_INTEGER, n, pos, currentPos()), std::optional<CompilationError>());
 				}
 				// 获取读到的字符的值，注意auto推导出的类型是char
 				auto ch = current_char.value();
@@ -165,19 +158,12 @@ namespace miniplc0 {
 				//     解析成功则返回无符号整数类型的token，否则返回编译错误
 				else{
                     unreadLast();
-                    std::string sss;
-                    ss >> sss;
-                    sss = delete_zero(sss);
-                    //超出integer范围
-                    if(isLarger(sss)){
-                        return std::make_pair(std::optional<Token>(), std::make_optional<CompilationError>(pos, ErrorCode::ErrIntegerOverflow));
-                    }
-                    //没有超出范围
                     int n;
-                    std::stringstream tmp;
-                    tmp << sss;
-                    tmp >> n;
-                    return std::make_pair(std::make_optional<Token>(TokenType::UNSIGNED_INTEGER,n , pos, currentPos()), std::optional<CompilationError>());
+					ss >> n;
+					if (ss.fail())
+					return std::make_pair(std::optional<Token>(), std::make_optional<CompilationError>(pos, ErrorCode::ErrIntegerOverflow));
+					else
+					return std::make_pair(std::make_optional<Token>(TokenType::UNSIGNED_INTEGER, n, pos, currentPos()), std::optional<CompilationError>());
 				}
 				break;
 			}
@@ -356,40 +342,5 @@ namespace miniplc0 {
 	// Note: Is it evil to unread a buffer?
 	void Tokenizer::unreadLast() {
 		_ptr = previousPos();
-	}
-
-	// 去掉数字前面的0
-	std::string Tokenizer::delete_zero(std::string s) {
-        int leng = s.length();
-        int i=0;
-        for(; i<leng; i++){
-            if(s[i] != '0'){
-                break;
-            }
-        }
-        std::string sss = "";
-        for(; i<leng; i++){
-            sss += s[i];
-        }
-        return sss;
-	}
-
-	//数字是否超范围，超范围返回1，未超范围返回0
-	int Tokenizer::isLarger(std::string s) {
-        if(s.length() > 10){
-            return 1;
-        }
-        else if(s.length() < 10){
-            return 0;
-        }
-        else{
-            std::string str = "2147483647";
-            if(str > s){
-                return 0;
-            }
-            else{
-                return 1;
-            }
-        }
 	}
 }
