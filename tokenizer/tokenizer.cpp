@@ -137,7 +137,7 @@ namespace miniplc0 {
 				//     解析成功则返回无符号整数类型的token，否则返回编译错误
 				if (!current_char.has_value()){
                     unreadLast();
-                    pos = previousPos();
+                    
                     std::string sss;
                     ss >> sss;
                     sss = delete_zero(sss);
