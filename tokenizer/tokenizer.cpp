@@ -176,8 +176,7 @@ namespace miniplc0 {
 				// 如果当前已经读到了文件尾，则解析已经读到的字符串
 				//     如果解析结果是关键字，那么返回对应关键字的token，否则返回标识符的token
 				if (!current_char.has_value()){
-                    auto sss;
-                    sss = ss.str();
+                    auto sss = ss.str();
                     if(sss == "BEGIN"){
                         return std::make_pair(std::make_optional<Token>(TokenType::BEGIN, "BEGIN", pos, currentPos()), std::optional<CompilationError>());
                     }
@@ -204,8 +203,7 @@ namespace miniplc0 {
 				//     如果解析结果是关键字，那么返回对应关键字的token，否则返回标识符的token
 				else{
                     unreadLast();
-                    auto sss;
-                    sss = ss.str();
+                    auto sss = ss.str();
                     if(sss == "BEGIN"){
                         return std::make_pair(std::make_optional<Token>(TokenType::BEGIN, "BEGIN", pos, currentPos()), std::optional<CompilationError>());
                     }
