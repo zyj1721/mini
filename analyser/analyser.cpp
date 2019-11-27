@@ -129,10 +129,12 @@ namespace miniplc0 {
 			if (next.value().GetType() != TokenType::EQUAL_SIGN) {
 				if (next.value().GetType() == TokenType::SEMICOLON){
 					addUninitializedVariable(tmp.value());
+					_instructions.emplace_back(Operation::LIT, 0);
 					return {};
 				}
 				return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoSemicolon);
 			}
+			addVariable(tmp.value());
 			// '<表达式>'
 			auto err = analyseExpression();
 			if (err.has_value())
@@ -141,8 +143,6 @@ namespace miniplc0 {
 			next = nextToken();
 			if (!next.has_value() || next.value().GetType() != TokenType::SEMICOLON)
 				return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoSemicolon);
-			// 生成一次 LIT 指令加载常量
-			//_instructions.emplace_back(Operation::LIT, val);	
 		}
 		
 		return {};
@@ -158,24 +158,29 @@ namespace miniplc0 {
 		while (true) {
 			// 预读
 			auto next = nextToken();
-			if (!next.has_value())
+			if (!next.has_value()){
 				return {};
-			unreadToken();
+			    
+			}
+				
 			if (next.value().GetType() != TokenType::IDENTIFIER &&
 				next.value().GetType() != TokenType::PRINT &&
 				next.value().GetType() != TokenType::SEMICOLON) {
 				return {};
+				unreadToken();
 			}
 			std::optional<CompilationError> err;
 			switch (next.value().GetType()) {
 				// 这里需要你针对不同的预读结果来调用不同的子程序
 			case TokenType::IDENTIFIER: {
+				unreadToken();
 				err = analyseAssignmentStatement();
 				if (err.has_value())
 				    return err;
 				break;
 			}
 			case TokenType::PRINT: {
+				unreadToken();
 				err = analyseOutputStatement();
 				if (err.has_value())
 				    return err;
@@ -203,9 +208,7 @@ namespace miniplc0 {
 		case TokenType::PLUS_SIGN:{
 			next = nextToken();
 			if (next.value().GetType() == TokenType::UNSIGNED_INTEGER){
-				int tmp;
-			    next >> tmp;
-			    out = tmp;
+				out = std::any_cast<int32_t>(next.value().GetValue());
 				return {};
 			}
 			else 
@@ -214,19 +217,14 @@ namespace miniplc0 {
 		case TokenType::MINUS_SIGN:{
 			next = nextToken();
 			if (next.value().GetType() == TokenType::UNSIGNED_INTEGER){
-				int tmp;
-			    next >> tmp;
-				tmp = -tmp;
-			    out = tmp;
+				out = -1*std::any_cast<int32_t>(next.value().GetValue());
 				return {};
 			}
 			else 
 			break;
 		}
 		case TokenType::UNSIGNED_INTEGER:{
-			int tmp;
-			next >> tmp;
-			out = tmp;
+			out = std::any_cast<int32_t>(next.value().GetValue());
 			return {};
 		}
 		default: break;
@@ -274,6 +272,19 @@ namespace miniplc0 {
 		// 标识符声明过吗？
 		// 标识符是常量吗？
 		// 需要生成指令吗？
+		auto next = nextToken();
+		if (!isDeclared(next.value().GetValueString()))
+		return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNotDeclared);
+		if (isConstant(next.value().GetValueString()))
+		return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrAssignToConstant);
+		tmp = next;
+		if (!isInitializedVariable(tmp.value().GetValueString())){		
+			int va = _uninitialized_vars[tmp.value().GetValueString()];
+            addVariable(tmp.value());
+			_vars[tmp.value().GetValueString()] = va;
+			_uninitialized_vars.erase(tmp.value().GetValueString());
+		}
+		_instructions.emplace_back(Operation::STO, getIndex(tmp.value().GetValueString()));
 		return {};
 	}
 
@@ -366,9 +377,16 @@ namespace miniplc0 {
 		switch (next.value().GetType()) {
 			// 这里和 <语句序列> 类似，需要根据预读结果调用不同的子程序
 			case IDENTIFIER:{
-				return{};
+				if (isConstant(next.value().GetValueString())||isInitializedVariable(next.value().GetValueString())){
+					_instructions.emplace_back(Operation::LOD, next.value().GetValueString()));
+					break;
+				}
+				else{
+					return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNotDeclared);	
+				}
 			}
 			case UNSIGNED_INTEGER:{
+				_instructions.emplace_back(Operation::LIT, next.value().GetValueString()));
 				return{};
 			}
 			case LEFT_BRACKET:{
@@ -381,7 +399,7 @@ namespace miniplc0 {
 		        next = nextToken();
 		        if (!next.has_value() || next.value().GetType() != TokenType::RIGHT_BRACKET)
 			    return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
-				return {};
+				break;
 			}
 			// 但是要注意 default 返回的是一个编译错误
 		default:
