@@ -177,20 +177,20 @@ namespace miniplc0 {
 				//     如果解析结果是关键字，那么返回对应关键字的token，否则返回标识符的token
 				if (!current_char.has_value()){
                     auto sss = ss.str();
-                    if(sss == "BEGIN"){
-                        return std::make_pair(std::make_optional<Token>(TokenType::BEGIN, "BEGIN", pos, currentPos()), std::optional<CompilationError>());
+                    if(sss == "begin"){
+                        return std::make_pair(std::make_optional<Token>(TokenType::BEGIN, "begin", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(sss == "END"){
-                        return std::make_pair(std::make_optional<Token>(TokenType::END, "END", pos, currentPos()), std::optional<CompilationError>());
+                    else if(sss == "end"){
+                        return std::make_pair(std::make_optional<Token>(TokenType::END, "end", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(sss == "VAR"){
-                        return std::make_pair(std::make_optional<Token>(TokenType::VAR, "VAR", pos, currentPos()), std::optional<CompilationError>());
+                    else if(sss == "var"){
+                        return std::make_pair(std::make_optional<Token>(TokenType::VAR, "var", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(sss == "CONST"){
-                        return std::make_pair(std::make_optional<Token>(TokenType::CONST, "CONST", pos, currentPos()), std::optional<CompilationError>());
+                    else if(sss == "const"){
+                        return std::make_pair(std::make_optional<Token>(TokenType::CONST, "const", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(sss == "PRINT"){
-                        return std::make_pair(std::make_optional<Token>(TokenType::PRINT, "PRINT", pos, currentPos()), std::optional<CompilationError>());
+                    else if(sss == "print"){
+                        return std::make_pair(std::make_optional<Token>(TokenType::PRINT, "print", pos, currentPos()), std::optional<CompilationError>());
                     }
                     else{
                         return std::make_pair(std::make_optional<Token>(TokenType::IDENTIFIER, sss, pos, currentPos()), std::optional<CompilationError>());
@@ -204,20 +204,20 @@ namespace miniplc0 {
 				else{
                     unreadLast();
                     auto sss = ss.str();
-                    if(sss == "BEGIN"){
-                        return std::make_pair(std::make_optional<Token>(TokenType::BEGIN, "BEGIN", pos, currentPos()), std::optional<CompilationError>());
+                    if(sss == "begin"){
+                        return std::make_pair(std::make_optional<Token>(TokenType::BEGIN, "begin", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(sss == "END"){
-                        return std::make_pair(std::make_optional<Token>(TokenType::END, "END", pos, currentPos()), std::optional<CompilationError>());
+                    else if(sss == "end"){
+                        return std::make_pair(std::make_optional<Token>(TokenType::END, "end", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(sss == "VAR"){
-                        return std::make_pair(std::make_optional<Token>(TokenType::VAR, "VAR", pos, currentPos()), std::optional<CompilationError>());
+                    else if(sss == "var"){
+                        return std::make_pair(std::make_optional<Token>(TokenType::VAR, "var", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(sss == "CONST"){
-                        return std::make_pair(std::make_optional<Token>(TokenType::CONST, "CONST", pos, currentPos()), std::optional<CompilationError>());
+                    else if(sss == "const"){
+                        return std::make_pair(std::make_optional<Token>(TokenType::CONST, "const", pos, currentPos()), std::optional<CompilationError>());
                     }
-                    else if(sss == "PRINT"){
-                        return std::make_pair(std::make_optional<Token>(TokenType::PRINT, "PRINT", pos, currentPos()), std::optional<CompilationError>());
+                    else if(sss == "print"){
+                        return std::make_pair(std::make_optional<Token>(TokenType::PRINT, "print", pos, currentPos()), std::optional<CompilationError>());
                     }
                     else{
                         return std::make_pair(std::make_optional<Token>(TokenType::IDENTIFIER, sss, pos, currentPos()), std::optional<CompilationError>());
