@@ -418,7 +418,7 @@ namespace miniplc0 {
                 return err;
             // ')'
             next = nextToken();
-            if (next.value().GetType() != TokenType::RIGHT_BRACKET){
+            if (!next.has_value() || next.value().GetType() != TokenType::RIGHT_BRACKET){
                 return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
             }
             break;
