@@ -33,22 +33,22 @@ namespace miniplc0 {
 	}
 
 	// <主过程> ::= <常量声明><变量声明><语句序列>
-	// 需要补全(done)
+	// 需要补全
 	std::optional<CompilationError> Analyser::analyseMain() {
 		// 完全可以参照 <程序> 编写
 
 		// <常量声明>
-		auto cd = analyseConstantDeclaration();
-		if (cd.has_value())
-		return cd;
+        auto err = analyseConstantDeclaration();
+        if (err.has_value())
+			return err;
 		// <变量声明>
-		auto vd = analyseVariableDeclaration();
-		if (vd.has_value())
-		return vd;
+        auto err = analyseVariableDeclaration();
+        if (err.has_value())
+			return err;
 		// <语句序列>
-		auto ss=analyseStatementSequence();
-		if (ss.has_value())
-		return ss;
+		auto err = analyseStatementSequence();
+        if (err.has_value())
+			return err;
 		return {};
 	}
 
@@ -103,48 +103,51 @@ namespace miniplc0 {
 	// 需要补全
 	std::optional<CompilationError> Analyser::analyseVariableDeclaration() {
 		// 变量声明语句可能有一个或者多个
-		while (true){
-			// 预读？
-			// 'var'
+		while(true){
+            // 预读一个 token，不然不知道是否应该用 <变量声明> 推导
 			auto next = nextToken();
 			if (!next.has_value())
 				return {};
-			// 如果是 var 那么说明应该推导 <变量声明> 否则直接返回
+            // 如果是 var 那么说明应该推导 <变量声明> 否则直接返回
 			if (next.value().GetType() != TokenType::VAR) {
 				unreadToken();
 				return {};
 			}
-			// <标识符>
+			// <变量声明语句>
+            // <标识符>
 			next = nextToken();
-			auto tmp = next;
+			auto temp = next;
 			if (!next.has_value() || next.value().GetType() != TokenType::IDENTIFIER)
 				return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNeedIdentifier);
 			if (isDeclared(next.value().GetValueString()))
 				return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrDuplicateDeclaration);
+			_instructions.emplace_back(Operation::LIT, 0);
+
 			// 变量可能没有初始化，仍然需要一次预读
-			// '='
 			next = nextToken();
 			if (!next.has_value())
-				return {};
-			if (next.value().GetType() != TokenType::EQUAL_SIGN) {
-				if (next.value().GetType() == TokenType::SEMICOLON){
-					addUninitializedVariable(tmp.value());
-					_instructions.emplace_back(Operation::LIT, 0);
-					return {};
-				}
-				return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoSemicolon);
-			}
-			addVariable(tmp.value());
-			// '<表达式>'
-			auto err = analyseExpression();
-			if (err.has_value())
-				return err;
-			// ';'
-			next = nextToken();
-			if (!next.has_value() || next.value().GetType() != TokenType::SEMICOLON)
-				return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoSemicolon);
+                return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
+            // '='
+            if (next.value().GetType() == TokenType::EQUAL_SIGN){
+                // '<表达式>'
+                auto err = analyseExpression();
+                if (err.has_value())
+                    return err;
+                // ';'
+                next = nextToken();
+                if (!next.has_value() || next.value().GetType() != TokenType::SEMICOLON)
+                    return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoSemicolon);
+                _instructions.emplace_back(Operation::STO, getIndex(temp.value().GetValueString()));
+            }
+            // ';'
+            else if (next.value().GetType() == TokenType::SEMICOLON){
+                addUninitializedVariable(temp.value());
+                continue;
+            }
+            else {
+                return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoSemicolon);
+            }
 		}
-		
 		return {};
 	}
 
@@ -153,40 +156,46 @@ namespace miniplc0 {
 	// <赋值语句> :: = <标识符>'='<表达式>';'
 	// <输出语句> :: = 'print' '(' <表达式> ')' ';'
 	// <空语句> :: = ';'
-	// 需要补全(done)
+	// 需要补全
 	std::optional<CompilationError> Analyser::analyseStatementSequence() {
 		while (true) {
 			// 预读
 			auto next = nextToken();
-			if (!next.has_value()){
+			if (!next.has_value())
 				return {};
-			    
-			}
-				
+			//unreadToken();
 			if (next.value().GetType() != TokenType::IDENTIFIER &&
 				next.value().GetType() != TokenType::PRINT &&
 				next.value().GetType() != TokenType::SEMICOLON) {
+                unreadToken();
 				return {};
-				unreadToken();
 			}
 			std::optional<CompilationError> err;
 			switch (next.value().GetType()) {
-				// 这里需要你针对不同的预读结果来调用不同的子程序
-			case TokenType::IDENTIFIER: {
-				unreadToken();
-				err = analyseAssignmentStatement();
-				if (err.has_value())
-				    return err;
-				break;
-			}
-			case TokenType::PRINT: {
-				unreadToken();
-				err = analyseOutputStatement();
-				if (err.has_value())
-				    return err;
-				break;
-			} 
-			default:// 注意我们没有针对空语句单独声明一个函数，因此可以直接在这里返回
+			    // 这里需要你针对不同的预读结果来调用不同的子程序
+				// 注意我们没有针对空语句单独声明一个函数，因此可以直接在这里返回
+
+            //空语句
+            case SEMICOLON: {
+                break;
+            }
+            //输出语句
+            case TokenType::PRINT: {
+                unreadToken();
+                err = analyseOutputStatement();
+                if (err.has_value())
+                    return err;
+                break;
+            }
+            //赋值语句
+            case IDENTIFIER: {
+                unreadToken();
+                err = analyseAssignmentStatement();
+                if (err.has_value())
+                    return err;
+                break;
+            }
+			default:
 				break;
 			}
 		}
@@ -196,39 +205,48 @@ namespace miniplc0 {
 	// <常表达式> ::= [<符号>]<无符号整数>
 	// 需要补全
 	std::optional<CompilationError> Analyser::analyseConstantExpression(int32_t& out) {
-		// out 是常表达式的结果
+	    // out 是常表达式的结果
 		// 这里你要分析常表达式并且计算结果
 		// 注意以下均为常表达式
 		// +1 -1 1
 		// 同时要注意是否溢出
 		auto next = nextToken();
+		auto prefix = 1;
 		if (!next.has_value())
-		return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
-		switch (next.value().GetType()){
-		case TokenType::PLUS_SIGN:{
+			return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
+		if (next.value().GetType() == TokenType::PLUS_SIGN){
+            next = nextToken();
+            if (!next.has_value()){
+                return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncomoleteExpression);
+            }
+            if (next.value().GetType == TokenType::UNSIGNED_INTEGER){
+                out = std::any_cast<int32_t>(next.value().GetValue());
+                return {};
+            }
+            else{
+                break;
+            }
+		}
+		else if (next.value().GetType() == TokenType::MINUS_SIGN) {
 			next = nextToken();
-			if (next.value().GetType() == TokenType::UNSIGNED_INTEGER){
-				out = std::any_cast<int32_t>(next.value().GetValue());
-				return {};
-			}
-			else 
-			break;
+            if (!next.has_value()){
+                return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncomoleteExpression);
+            }
+            if (next.value().GetType == TokenType::UNSIGNED_INTEGER){
+                out = -1 * std::any_cast<int32_t>(next.value().GetValue());
+                return {};
+            }
+            else{
+                break;
+            }
 		}
-		case TokenType::MINUS_SIGN:{
-			next = nextToken();
-			if (next.value().GetType() == TokenType::UNSIGNED_INTEGER){
-				out = -1*std::any_cast<int32_t>(next.value().GetValue());
-				return {};
-			}
-			else 
-			break;
-		}
-		case TokenType::UNSIGNED_INTEGER:{
-			out = std::any_cast<int32_t>(next.value().GetValue());
-			return {};
-		}
-		default: break;
-		}
+		else if (next.value().GetType() == TokenType::UNSIGNED_INTEGER){
+            out = std::any_cast<int32_t>(next.value().GetValue());
+            return {};
+        }
+        else {
+            break;
+        }
 		return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
 	}
 
@@ -268,31 +286,40 @@ namespace miniplc0 {
 	// <赋值语句> ::= <标识符>'='<表达式>';'
 	// 需要补全
 	std::optional<CompilationError> Analyser::analyseAssignmentStatement() {
+	    auto iden = nextToken();
+	    if (!iden.has_value())
+			return {};
+        auto temp = next;
+        // 标识符声明过吗？
+        if (!isDeclared(next.value().GetValueString())) {
+            return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNotDeclared);
+        }
+        // 标识符是常量吗？
+        if (isConstant(next.value().GetValueString())) {
+            return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrAssignToConstant);
+        }
+        //'='
+        next = nextToken();
+        if (next.value().GetType() != TokenType::EQUAL_SIGN)
+			return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
+        //表达式
+        auto err = analyseExpression();
+        if (err.has_value())
+            return err;
 		// 这里除了语法分析以外还要留意
-		// 标识符声明过吗？
-		// 标识符是常量吗？
 		// 需要生成指令吗？
-		auto next = nextToken();
-		if (!isDeclared(next.value().GetValueString()))
-		return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNotDeclared);
-		if (isConstant(next.value().GetValueString()))
-		return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrAssignToConstant);
-		next = nextToken();
-		if (next.value().GetType() != EQUAL_SIGN)
-		return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
-		next = nextToken();
-		auto tmp = next;
-		if (!isInitializedVariable(tmp.value().GetValueString())){		
-			int va = _uninitialized_vars[tmp.value().GetValueString()];
-            addVariable(tmp.value());
-			_vars[tmp.value().GetValueString()] = va;
-			_uninitialized_vars.erase(tmp.value().GetValueString());
-		}
-		_instructions.emplace_back(Operation::STO, getIndex(tmp.value().GetValueString()));
-		next=nextToken();
-		if (next.value().GetType() != SEMICOLON)
-		return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoSemicolon);
-		return {};
+		if (!isInitializedVariable(tmp.value().GetValueString())){
+            int varr = _uninitialized_vars[tmp.value().GetValueString()];
+            addVariable(temp.value());
+            _vars[tmp.value().GetValueString()] = varr;
+            _uninitialized_vars.erase(tmp.value().GetValueString());
+        }
+        _instructions.emplace_back(Operation::STO, getIndex(tmp.value().GetValueString()));
+        next = nextToken();
+        if (next.value().GetType() != SEMICOLON){
+            return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoSemicolon);
+        }
+        return {};
 	}
 
 	// <输出语句> ::= 'print' '(' <表达式> ')' ';'
@@ -326,15 +353,14 @@ namespace miniplc0 {
 	}
 
 	// <项> :: = <因子>{ <乘法型运算符><因子> }
-	// 需要补全(done)
+	// 需要补全
 	std::optional<CompilationError> Analyser::analyseItem() {
 		// 可以参考 <表达式> 实现
 		// <因子>
 		auto err = analyseFactor();
 		if (err.has_value())
 			return err;
-
-		// {<乘法型运算符><因子>}
+        // {<乘法型运算符><因子>}
 		while (true) {
 			// 预读
 			auto next = nextToken();
@@ -381,35 +407,35 @@ namespace miniplc0 {
 		next = nextToken();
 		if (!next.has_value())
 			return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
+        // 这里和 <语句序列> 类似，需要根据预读结果调用不同的子程序
+        // 但是要注意 default 返回的是一个编译错误
 		switch (next.value().GetType()) {
-			// 这里和 <语句序列> 类似，需要根据预读结果调用不同的子程序
-			case IDENTIFIER:{
-				if (isConstant(next.value().GetValueString())||isInitializedVariable(next.value().GetValueString())){
-					_instructions.emplace_back(Operation::LOD, getIndex(next.value().GetValueString()));
-					break;
-				}
-				else{
-					return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNotDeclared);	
-				}
-			}
-			case UNSIGNED_INTEGER:{
-				int32_t tmp=std::any_cast<int32_t>(next.value()) ;
-				_instructions.emplace_back(Operation::LIT, tmp);
-				return{};
-			}
-			case LEFT_BRACKET:{
-				// <表达式>
-		        auto err = analyseExpression();
-		        if (err.has_value())
-			    return err;
-
-		        // ')'
-		        next = nextToken();
-		        if (!next.has_value() || next.value().GetType() != TokenType::RIGHT_BRACKET)
-			    return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
-				break;
-			}
-			// 但是要注意 default 返回的是一个编译错误
+        case IDENTIFIER: {
+            if (isConstant(next.value().GetValueString()) || isInitializedVariable(next.value().GetValueString())){
+                _instructions.emplace_back(Operation::LOD, getIndex(next.value().GetValueString()));
+                break;
+            }
+            else{
+                return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNotDeclared);
+            }
+        }
+        case UNSIGNED_INTEGER: {
+            int32_t tmp = std::any_cast<int32_t>(next.value().GetValue());
+            _instructions.emplace_back(Operation::LIT, tmp);
+            return {};
+        }
+        case LEFT_BRACKET: {
+            // <表达式>
+            auto err = analyseExpression();
+            if (err.has_value())
+                return err;
+            // ')'
+            next = nextToken();
+            if (next.value().GetType() != TokenType::RIGHT_BRACKET){
+                return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
+            }
+            break;
+        }
 		default:
 			return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
 		}
@@ -420,6 +446,7 @@ namespace miniplc0 {
 		return {};
 	}
 
+	//返回下一个token
 	std::optional<Token> Analyser::nextToken() {
 		if (_offset == _tokens.size())
 			return {};
@@ -429,6 +456,7 @@ namespace miniplc0 {
 		return _tokens[_offset++];
 	}
 
+	//回退一个token
 	void Analyser::unreadToken() {
 		if (_offset == 0)
 			DieAndPrint("analyser unreads token from the begining.");
@@ -443,18 +471,22 @@ namespace miniplc0 {
 		_nextTokenIndex++;
 	}
 
+	//添加变量
 	void Analyser::addVariable(const Token& tk) {
 		_add(tk, _vars);
 	}
 
+	//添加常量
 	void Analyser::addConstant(const Token& tk) {
 		_add(tk, _consts);
 	}
 
+	//添加未初始化的变量
 	void Analyser::addUninitializedVariable(const Token& tk) {
 		_add(tk, _uninitialized_vars);
 	}
 
+	//获得{变量, 常量} 在栈上的偏移
 	int32_t Analyser::getIndex(const std::string& s) {
 		if (_uninitialized_vars.find(s) != _uninitialized_vars.end())
 			return _uninitialized_vars[s];
@@ -464,17 +496,22 @@ namespace miniplc0 {
 			return _consts[s];
 	}
 
+	//是否被声明过
 	bool Analyser::isDeclared(const std::string& s) {
 		return isConstant(s) || isUninitializedVariable(s) || isInitializedVariable(s);
 	}
 
+	//是否是为初始化的变量
 	bool Analyser::isUninitializedVariable(const std::string& s) {
 		return _uninitialized_vars.find(s) != _uninitialized_vars.end();
 	}
+
+	//是否是已初始化的变量
 	bool Analyser::isInitializedVariable(const std::string&s) {
 		return _vars.find(s) != _vars.end();
 	}
 
+	//是否是常量
 	bool Analyser::isConstant(const std::string&s) {
 		return _consts.find(s) != _consts.end();
 	}
