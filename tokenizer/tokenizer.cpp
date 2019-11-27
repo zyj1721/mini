@@ -259,7 +259,7 @@ namespace miniplc0 {
 			case RIGHTBRACKET_STATE: {
 				// 请填空：回退，并返回减号token
 				unreadLast(); 
-				return std::make_pair(std::make_optional<Token>(TokenType::RIGHT_BRACKET, '(', pos, currentPos()), std::optional<CompilationError>());
+				return std::make_pair(std::make_optional<Token>(TokenType::RIGHT_BRACKET, ')', pos, currentPos()), std::optional<CompilationError>());
 			}
 								   // 预料之外的状态，如果执行到了这里，说明程序异常
 			default:
