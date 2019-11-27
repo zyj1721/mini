@@ -127,27 +127,24 @@ namespace miniplc0 {
 			next = nextToken();
 			if (!next.has_value())
                 return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
-            // '='
-            if (next.value().GetType() == TokenType::EQUAL_SIGN){
-                // '<表达式>'
-                auto err = analyseExpression();
-                if (err.has_value())
-                    return err;
-                // ';'
-                next = nextToken();
-                if (!next.has_value() || next.value().GetType() != TokenType::SEMICOLON)
-                    return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoSemicolon);
-                _instructions.emplace_back(Operation::STO, getIndex(temp.value().GetValueString()));
-            }
-            // ';'
-            else if (next.value().GetType() == TokenType::SEMICOLON){
-                addUninitializedVariable(temp.value());
-                continue;
-            }
-            else {
+            if (next.value().GetType() != TokenType::EQUAL_SIGN) {
+                if (next.value().GetType() == TokenType::SEMICOLON) {
+                    addUninitializedVariable(temp.value());
+                    continue;
+                }
                 return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoSemicolon);
             }
-		}
+            addVariable(temp.value());
+            // '<表达式>'
+            auto err = analyseExpression();
+            if (err.has_value())
+                return err;
+            // ';'
+            next = nextToken();
+            if (!next.has_value() || next.value().GetType() != TokenType::SEMICOLON)
+                return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoSemicolon);
+            _instructions.emplace_back(Operation::STO, getIndex(tmp.value().GetValueString()));
+        }
 		return {};
 	}
 
@@ -176,7 +173,7 @@ namespace miniplc0 {
 				// 注意我们没有针对空语句单独声明一个函数，因此可以直接在这里返回
 
             //空语句
-            case SEMICOLON: {
+            case TokenType::SEMICOLON: {
                 break;
             }
             //输出语句
@@ -188,7 +185,7 @@ namespace miniplc0 {
                 break;
             }
             //赋值语句
-            case IDENTIFIER: {
+            case TokenType::IDENTIFIER: {
                 unreadToken();
                 err = analyseAssignmentStatement();
                 if (err.has_value())
