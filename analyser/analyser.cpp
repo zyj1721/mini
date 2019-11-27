@@ -378,7 +378,7 @@ namespace miniplc0 {
 			// 这里和 <语句序列> 类似，需要根据预读结果调用不同的子程序
 			case IDENTIFIER:{
 				if (isConstant(next.value().GetValueString())||isInitializedVariable(next.value().GetValueString())){
-					_instructions.emplace_back(Operation::LOD, next.value().GetValueString());
+					_instructions.emplace_back(Operation::LOD, getIndex(next.value().GetValueString()));
 					break;
 				}
 				else{
@@ -386,7 +386,7 @@ namespace miniplc0 {
 				}
 			}
 			case UNSIGNED_INTEGER:{
-				_instructions.emplace_back(Operation::LIT, next.value().GetValueString());
+				_instructions.emplace_back(Operation::LIT, next.value());
 				return{};
 			}
 			case LEFT_BRACKET:{
