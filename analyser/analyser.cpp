@@ -118,10 +118,13 @@ namespace miniplc0 {
                 }
                 // <标识符>
                 next=nextToken();
+
                 if(!next.has_value()||next.value().GetType()!=TokenType::IDENTIFIER)
                     return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNeedIdentifier);
                 if(isDeclared(next.value().GetValueString()))
                     return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrDuplicateDeclaration);
+
+                _instructions.emplace_back(Operation::LIT, 0);
                 auto nextvar=next.value();
                 // 变量可能没有初始化，仍然需要一次预读
               //  addUninitializedVariable(next.value());
@@ -129,7 +132,7 @@ namespace miniplc0 {
                 改这个
                 */
                 // '='
-                next = nextToken();
+
                 /*
                 if (next.has_value() && next.value().GetType()==TokenType ::SEMICOLON)//分号
                 {
@@ -156,6 +159,7 @@ namespace miniplc0 {
                     return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoSemicolon);
                 }
                     */
+                next = nextToken();
                 if(!next.has_value())
                     return {};
                 if(next.value().GetType()!=TokenType::EQUAL_SIGN)//如果没有等于
@@ -180,8 +184,10 @@ namespace miniplc0 {
                     next=nextToken();
                     if (!next.has_value() || next.value().GetType() != TokenType::SEMICOLON)
                           return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoSemicolon);
-                _instructions.emplace_back(Operation::STO, getIndex(temp.value().GetValueString()));
 
+
+                    _instructions.emplace_back(Operation::STO, getIndex(nextvar.GetValueString()));
+               // printf("成功");
                 // ';'
                 // 生成一次 LIT 指令加载常量
             }
@@ -200,10 +206,11 @@ namespace miniplc0 {
 			auto next = nextToken();
 			if (!next.has_value())
 				return {};
-			unreadToken();
+			//unreadToken();
 			if (next.value().GetType() != TokenType::IDENTIFIER &&
 				next.value().GetType() != TokenType::PRINT &&
 				next.value().GetType() != TokenType::SEMICOLON) {
+			    unreadToken();
 				return {};
 			}
 			std::optional<CompilationError> err;
@@ -228,9 +235,7 @@ namespace miniplc0 {
                 }
                 case TokenType ::SEMICOLON :
                 {
-                    return  {
 
-                    };
                     break;
                 }
 				// 这里需要你针对不同的预读结果来调用不同的子程序
@@ -484,7 +489,7 @@ std::optional<CompilationError> Analyser::analyseFactor() {
     if (!next.has_value())
         return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
     switch (next.value().GetType()) {
-        case TokenType ::IDENTIFIER:
+        case IDENTIFIER:
         {
             /*if(!isDeclared(next.value().GetValueString()))
                 return std::make_optional<CompilationError>(_current_pos,ErrorCode::ErrNotDeclared);
@@ -505,7 +510,7 @@ std::optional<CompilationError> Analyser::analyseFactor() {
             //是否初始化
             //赋值
         }
-        case TokenType ::UNSIGNED_INTEGER:
+        case UNSIGNED_INTEGER:
         {
             int tem;
          //   next.value().GetValueString()>>tem;
@@ -515,7 +520,7 @@ std::optional<CompilationError> Analyser::analyseFactor() {
             break;
 
         }
-        case TokenType ::LEFT_BRACKET:
+        case LEFT_BRACKET:
         {
             auto biaoda=analyseExpression();
             if(biaoda.has_value())
