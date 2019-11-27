@@ -127,8 +127,8 @@ namespace miniplc0 {
 			if (!next.has_value())
 				return {};
 			if (next.value().GetType() != TokenType::EQUAL_SIGN) {
-				if (next.value().GetType() = TokenType::SEMICOLON){
-					addUninitializedVariable(tmp);
+				if (next.value().GetType() == TokenType::SEMICOLON){
+					addUninitializedVariable(tmp.value());
 					return {};
 				}
 				return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoSemicolon);
@@ -203,7 +203,9 @@ namespace miniplc0 {
 		case TokenType::PLUS_SIGN:{
 			next = nextToken();
 			if (next.value().GetType() == TokenType::UNSIGNED_INTEGER){
-				out = next.value();
+				int tmp;
+			    next >> tmp;
+			    out = tmp;
 				return {};
 			}
 			else 
@@ -212,14 +214,19 @@ namespace miniplc0 {
 		case TokenType::MINUS_SIGN:{
 			next = nextToken();
 			if (next.value().GetType() == TokenType::UNSIGNED_INTEGER){
-				out = -next.value();
+				int tmp;
+			    next >> tmp;
+				tmp = -tmp;
+			    out = tmp;
 				return {};
 			}
 			else 
 			break;
 		}
 		case TokenType::UNSIGNED_INTEGER:{
-			out = next.value();
+			int tmp;
+			next >> tmp;
+			out = tmp;
 			return {};
 		}
 		default: break;
