@@ -211,7 +211,6 @@ namespace miniplc0 {
 		// +1 -1 1
 		// 同时要注意是否溢出
 		auto next = nextToken();
-		auto prefix = 1;
 		if (!next.has_value())
 			return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
 		if (next.value().GetType() == TokenType::PLUS_SIGN){
@@ -237,9 +236,6 @@ namespace miniplc0 {
 		else if (next.value().GetType() == TokenType::UNSIGNED_INTEGER){
             out = std::any_cast<int32_t>(next.value().GetValue());
             return {};
-        }
-        else {
-            break;
         }
 		return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
 	}
@@ -305,7 +301,7 @@ namespace miniplc0 {
 		if (!isInitializedVariable(tmp.value().GetValueString())){
             int varr = _uninitialized_vars[tmp.value().GetValueString()];
             addVariable(temp.value());
-            _vars[tmp.value().GetValueString()] = varr;
+            _vars[temp.value().GetValueString()] = varr;
             _uninitialized_vars.erase(temp.value().GetValueString());
         }
         _instructions.emplace_back(Operation::STO, getIndex(temp.value().GetValueString()));
