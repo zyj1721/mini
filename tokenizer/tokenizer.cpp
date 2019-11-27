@@ -246,17 +246,17 @@ namespace miniplc0 {
 				unreadLast(); 
 				return std::make_pair(std::make_optional<Token>(TokenType::EQUAL_SIGN, '=', pos, currentPos()), std::optional<CompilationError>());
 			}
-			case SEMICOLON_SIGN_STATE: {
+			case SEMICOLON_STATE: {
 				// 请填空：回退，并返回减号token
 				unreadLast(); 
 				return std::make_pair(std::make_optional<Token>(TokenType::SEMICOLON_SIGN, ';', pos, currentPos()), std::optional<CompilationError>());
 			}
-			case LEFTBRACKET_SIGN_STATE: {
+			case LEFTBRACKET_STATE: {
 				// 请填空：回退，并返回减号token
 				unreadLast(); 
 				return std::make_pair(std::make_optional<Token>(TokenType::LEFT_BRACKET, '(', pos, currentPos()), std::optional<CompilationError>());
 			}
-			case RIGHTBRACKET_SIGN_STATE: {
+			case RIGHTBRACKET_STATE: {
 				// 请填空：回退，并返回减号token
 				unreadLast(); 
 				return std::make_pair(std::make_optional<Token>(TokenType::RIGHT_BRACKET, '(', pos, currentPos()), std::optional<CompilationError>());
