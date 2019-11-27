@@ -249,7 +249,7 @@ namespace miniplc0 {
 			case SEMICOLON_STATE: {
 				// 请填空：回退，并返回减号token
 				unreadLast(); 
-				return std::make_pair(std::make_optional<Token>(TokenType::SEMICOLON_SIGN, ';', pos, currentPos()), std::optional<CompilationError>());
+				return std::make_pair(std::make_optional<Token>(TokenType::SEMICOLON, ';', pos, currentPos()), std::optional<CompilationError>());
 			}
 			case LEFTBRACKET_STATE: {
 				// 请填空：回退，并返回减号token
