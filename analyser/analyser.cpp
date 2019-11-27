@@ -386,7 +386,8 @@ namespace miniplc0 {
 				}
 			}
 			case UNSIGNED_INTEGER:{
-				_instructions.emplace_back(Operation::LIT, next.value());
+				std::any_cast<int32_t>tmp = next.value();
+				_instructions.emplace_back(Operation::LIT, tmp);
 				return{};
 			}
 			case LEFT_BRACKET:{
