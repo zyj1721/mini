@@ -277,6 +277,10 @@ namespace miniplc0 {
 		return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNotDeclared);
 		if (isConstant(next.value().GetValueString()))
 		return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrAssignToConstant);
+		next = nextToken();
+		if (next.value().GetType() != EQUAL_SIGN)
+		return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
+		next = nextToken();
 		auto tmp = next;
 		if (!isInitializedVariable(tmp.value().GetValueString())){		
 			int va = _uninitialized_vars[tmp.value().GetValueString()];
@@ -285,6 +289,9 @@ namespace miniplc0 {
 			_uninitialized_vars.erase(tmp.value().GetValueString());
 		}
 		_instructions.emplace_back(Operation::STO, getIndex(tmp.value().GetValueString()));
+		next=nextToken();
+		if (next.value().GetType() != SEMICOLON)
+		return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoSemicolon);
 		return {};
 	}
 
