@@ -143,7 +143,7 @@ namespace miniplc0 {
             next = nextToken();
             if (!next.has_value() || next.value().GetType() != TokenType::SEMICOLON)
                 return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoSemicolon);
-            _instructions.emplace_back(Operation::STO, getIndex(tmp.value().GetValueString()));
+            _instructions.emplace_back(Operation::STO, getIndex(temp.value().GetValueString()));
         }
 		return {};
 	}
