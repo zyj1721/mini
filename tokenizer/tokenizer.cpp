@@ -139,42 +139,36 @@ namespace miniplc0 {
                     std::string sss = ss.str();
                     try {
 							// 解析成功则返回无符号整数类型的token
-							return std::make_pair(
-									std::make_optional<Token>(TokenType::UNSIGNED_INTEGER, std::stoi(sss), pos, currentPos()),	std::optional<CompilationError>());
+							return std::make_pair(std::make_optional<Token>(TokenType::UNSIGNED_INTEGER, std::stoi(sss), pos, currentPos()),std::optional<CompilationError>());
 						} catch(...) {
 							// 否则返回编译错误
 							return std::make_pair(std::optional<Token>(), std::make_optional<CompilationError>(pos, ErrorCode::ErrIntegerOverflow));
 						}
                 }
 				// 获取读到的字符的值，注意auto推导出的类型是char
-				auto ch = current_char.value();
-				// 如果读到的字符是数字，则存储读到的字符
-				if (miniplc0::isdigit(ch)){
-                    ss << ch;
-				}
-				// 如果读到的是字母，则存储读到的字符，并切换状态到标识符
-				else if (miniplc0::isalpha(ch)){
-                    ss << ch;
-                    current_state = DFAState::IDENTIFIER_STATE;
-				}
-				// 如果读到的字符不是上述情况之一，则回退读到的字符，并解析已经读到的字符串为整数
-				//     解析成功则返回无符号整数类型的token，否则返回编译错误
 				else{
-                    unreadLast();
-                    if (!current_char.has_value()){
-                    std::string sss = ss.str();
-                    try {
-							// 解析成功则返回无符号整数类型的token
-							return std::make_pair(
-									std::make_optional<Token>(TokenType::UNSIGNED_INTEGER, std::stoi(sss), pos, currentPos()),	std::optional<CompilationError>());
-						} catch(...) {
-							// 否则返回编译错误
-							return std::make_pair(std::optional<Token>(), std::make_optional<CompilationError>(pos, ErrorCode::ErrIntegerOverflow));
-						}
+                    auto ch = current_char.value();
+						if (miniplc0::isdigit(ch)) { // 如果读到的字符是数字
+							ss << ch; // 存储读到的字符
+						} else if (miniplc0::isalpha(ch)) {
+							ss << ch; // 存储读到的字符
+							current_state = DFAState::IDENTIFIER_STATE; // 切换状态到标识符
+						} else {
+							unreadLast(); // 回退读到的字符
+							// 解析已经读到的字符串为整数
+							try {
+								// 解析成功则返回无符号整数类型的token
+								return std::make_pair(std::make_optional<Token>(TokenType::UNSIGNED_INTEGER, std::stoi(ss.str()), pos, currentPos()),
+										std::optional<CompilationError>());
+							} catch(...) {
+								// 否则返回编译错误
+								return std::make_pair(std::optional<Token>(), std::make_optional<CompilationError>(pos, ErrorCode::ErrIntegerOverflow));
+							}
                     }
                 }
-				break;
-			}
+                break;
+            }
+
                                     // 当前状态是标识符
 			case IDENTIFIER_STATE: {
 				// 如果当前已经读到了文件尾，则解析已经读到的字符串
