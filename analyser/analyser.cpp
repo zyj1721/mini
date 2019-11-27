@@ -38,17 +38,17 @@ namespace miniplc0 {
 		// 完全可以参照 <程序> 编写
 
 		// <常量声明>
-        auto err = analyseConstantDeclaration();
-        if (err.has_value())
-			return err;
+        auto cons = analyseConstantDeclaration();
+        if (cons.has_value())
+			return cons;
 		// <变量声明>
-        auto err = analyseVariableDeclaration();
-        if (err.has_value())
-			return err;
+        auto vari = analyseVariableDeclaration();
+        if (vari.has_value())
+			return vari;
 		// <语句序列>
-		auto err = analyseStatementSequence();
-        if (err.has_value())
-			return err;
+		auto stat = analyseStatementSequence();
+        if (stat.has_value())
+			return stat;
 		return {};
 	}
 
@@ -217,27 +217,21 @@ namespace miniplc0 {
 		if (next.value().GetType() == TokenType::PLUS_SIGN){
             next = nextToken();
             if (!next.has_value()){
-                return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncomoleteExpression);
+                return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
             }
-            if (next.value().GetType == TokenType::UNSIGNED_INTEGER){
+            if (next.value().GetType() == TokenType::UNSIGNED_INTEGER){
                 out = std::any_cast<int32_t>(next.value().GetValue());
                 return {};
-            }
-            else{
-                break;
             }
 		}
 		else if (next.value().GetType() == TokenType::MINUS_SIGN) {
 			next = nextToken();
             if (!next.has_value()){
-                return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncomoleteExpression);
+                return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIncompleteExpression);
             }
-            if (next.value().GetType == TokenType::UNSIGNED_INTEGER){
+            if (next.value().GetType() == TokenType::UNSIGNED_INTEGER){
                 out = -1 * std::any_cast<int32_t>(next.value().GetValue());
                 return {};
-            }
-            else{
-                break;
             }
 		}
 		else if (next.value().GetType() == TokenType::UNSIGNED_INTEGER){
@@ -286,8 +280,8 @@ namespace miniplc0 {
 	// <赋值语句> ::= <标识符>'='<表达式>';'
 	// 需要补全
 	std::optional<CompilationError> Analyser::analyseAssignmentStatement() {
-	    auto iden = nextToken();
-	    if (!iden.has_value())
+	    auto next = nextToken();
+	    if (!next.has_value())
 			return {};
         auto temp = next;
         // 标识符声明过吗？
@@ -312,9 +306,9 @@ namespace miniplc0 {
             int varr = _uninitialized_vars[tmp.value().GetValueString()];
             addVariable(temp.value());
             _vars[tmp.value().GetValueString()] = varr;
-            _uninitialized_vars.erase(tmp.value().GetValueString());
+            _uninitialized_vars.erase(temp.value().GetValueString());
         }
-        _instructions.emplace_back(Operation::STO, getIndex(tmp.value().GetValueString()));
+        _instructions.emplace_back(Operation::STO, getIndex(temp.value().GetValueString()));
         next = nextToken();
         if (next.value().GetType() != SEMICOLON){
             return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNoSemicolon);
