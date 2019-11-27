@@ -299,7 +299,7 @@ namespace miniplc0 {
 		// 这里除了语法分析以外还要留意
 		// 需要生成指令吗？
 		if (!isInitializedVariable(temp.value().GetValueString())){
-            int varr = _uninitialized_vars[tmp.value().GetValueString()];
+            int varr = _uninitialized_vars[temp.value().GetValueString()];
             addVariable(temp.value());
             _vars[temp.value().GetValueString()] = varr;
             _uninitialized_vars.erase(temp.value().GetValueString());
