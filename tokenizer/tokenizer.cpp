@@ -150,10 +150,12 @@ namespace miniplc0 {
                     auto ch = current_char.value();
 						if (miniplc0::isdigit(ch)) { // 如果读到的字符是数字
 							ss << ch; // 存储读到的字符
-						} else if (miniplc0::isalpha(ch)) {
+						}
+						else if (miniplc0::isalpha(ch)) {
 							ss << ch; // 存储读到的字符
 							current_state = DFAState::IDENTIFIER_STATE; // 切换状态到标识符
-						} else {
+						}
+						else {
 							unreadLast(); // 回退读到的字符
 							// 解析已经读到的字符串为整数
 							try {
@@ -174,7 +176,7 @@ namespace miniplc0 {
 				// 如果当前已经读到了文件尾，则解析已经读到的字符串
 				//     如果解析结果是关键字，那么返回对应关键字的token，否则返回标识符的token
 				if (!current_char.has_value()){
-                    std::string sss;
+                    auto sss;
                     sss = ss.str();
                     if(sss == "BEGIN"){
                         return std::make_pair(std::make_optional<Token>(TokenType::BEGIN, "BEGIN", pos, currentPos()), std::optional<CompilationError>());
@@ -202,7 +204,7 @@ namespace miniplc0 {
 				//     如果解析结果是关键字，那么返回对应关键字的token，否则返回标识符的token
 				else{
                     unreadLast();
-                    std::string sss;
+                    auto sss;
                     sss = ss.str();
                     if(sss == "BEGIN"){
                         return std::make_pair(std::make_optional<Token>(TokenType::BEGIN, "BEGIN", pos, currentPos()), std::optional<CompilationError>());
